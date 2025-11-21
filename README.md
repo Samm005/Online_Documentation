@@ -1,1 +1,1 @@
-# Online_Documentation
+A digital document management system that adapts responsively, enabling users to upload, name, view, delete, search, and set email/date notifications for their documents. It features login/signup capabilities, reminders, an interactive search function, and a clean user interface built with Bootstrap. The system is developed using HTML, CSS, JavaScript, and LocalStorage.

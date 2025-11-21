@@ -1,0 +1,174 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #87ffe9, #abbaff);
+           background-size: cover; 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: white;
+        }
+        .nav-item{
+            font-size: 20px;
+            font-family: 'Lora', serif;
+        }
+        .form-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            color: white;
+        }
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+        }
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .btn-primary {
+            background-color: #00eaff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #00c0d9;
+        }
+        .toggle-link a {
+            color: #00eaff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-black d-flex justify-content-between align-items-center px-3">
+        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+            <div class="collapse w-100" id="navbarNav">
+                <ul class="navbar-nav mt-2 text-start">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="more.html">More</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="login.html">Login</a></li>
+                </ul>
+            </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="container d-flex flex-column align-items-center justify-content-center vh-100">
+        <div class="col-md-5">
+            <!-- Login Form -->
+            <div class="form-container border border-2 border-white shadow-lg p-5 w-75 mx-auto" id="login-form">
+                <h2 class="text-center mt-5">LOGIN</h2><br>
+                <form onsubmit="return validateLogin()">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                        <small id="emailError" class="text-danger d-none">Invalid email format</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                        <small id="passwordError" class="text-danger d-none">Password must be at least 6 characters</small>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Login</button>
+                </form>
+                <div class="text-center mt-3 toggle-link">
+                    <p>Forgot your password? <a href="javascript:void(0);" onclick="showForgotPasswordForm()" class="text-primary">Reset</a></p>
+                    <p>Don't have an account? <a href="signup.html" class="text-primary">Sign Up</a></p>
+                </div>
+            </div>
+
+            <!-- Forgot Password Form -->
+            <div class="form-container d-none" id="forgot-password-form">
+                <h2 class="text-center">Forgot Password</h2>
+                <form onsubmit="return validateResetPassword()">
+                    <div class="mb-3">
+                        <label for="reset-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="reset-email" name="email" placeholder="Your email address" required>
+                        <small id="resetEmailError" class="text-danger d-none">Invalid email format</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new-password" name="new-password" placeholder="Enter new password" required>
+                        <small id="newPasswordError" class="text-danger d-none">Password must be at least 6 characters</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm-new-password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm-new-password" name="confirm-new-password" placeholder="Confirm new password" required>
+                        <small id="confirmPasswordError" class="text-danger d-none">Passwords do not match</small>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Set New Password</button>
+                </form>
+                <div class="text-center mt-3 toggle-link">
+                    <p>Remembered your password? <a href="javascript:void(0);" onclick="showLoginForm()" class="text-primary">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function showForgotPasswordForm() {
+            document.getElementById("login-form").classList.add("d-none");
+            document.getElementById("forgot-password-form").classList.remove("d-none");
+        }
+    
+        function showLoginForm() {
+            document.getElementById("forgot-password-form").classList.add("d-none");
+            document.getElementById("login-form").classList.remove("d-none");
+        }
+    
+        function validateLogin() {
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let emailError = document.getElementById("emailError");
+            let passwordError = document.getElementById("passwordError");
+    
+            emailError.classList.add("d-none");
+            passwordError.classList.add("d-none");
+    
+            if (!email.match(/^\S+@\S+\.\S+$/)) {
+                emailError.classList.remove("d-none");
+                return false;
+            }
+            if (password.length < 6) {
+                passwordError.classList.remove("d-none");
+                return false;
+            }
+    
+            // Store user details
+            localStorage.setItem("email", email);
+            localStorage.setItem("username", email.split("@")[0]); // Extract username from email
+    
+            // Redirect to welcome page
+            window.location.href = "welcome.html";
+            return false; // Prevent default form submission
+        }
+    
+        function validateResetPassword() {
+            let email = document.getElementById("reset-email").value;
+            let newPassword = document.getElementById("new-password").value;
+            let confirmNewPassword = document.getElementById("confirm-new-password").value;
+    
+            if (!email.match(/^\S+@\S+\.\S+$/)) return false;
+            if (newPassword.length < 6) return false;
+            if (newPassword !== confirmNewPassword) return false;
+            
+            return true;
+        }
+    </script>
+    
+
+</body>
+</html>

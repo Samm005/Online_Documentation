@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - DigiDoc</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to right,#87ffe9, #abbaff);
+            background-position: center;
+            color: rgb(0, 0, 0);
+            text-align: center;
+        }
+
+        .nav-item {
+            font-size: 20px;
+            font-family: 'Lora', serif;
+        }
+
+        /* Prevent page movement when hovering over the navbar dropdown */
+        .navbar .dropdown-menu {
+            position: absolute;
+            z-index: 1050;
+            top: 100%;
+            left: 0;
+        }
+
+        .alerts-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5%; /* Reduced padding to move it closer to the navbar */
+            border-radius: 10px;
+            margin-top: 1px; /* Reduced space from navbar */
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(11, 11, 11, 0.955);
+            color: rgb(14, 14, 14);
+            border: none;
+            padding: 20px;
+        }
+
+        .form-select {
+    background-color: rgb(10, 10, 10);
+    color: white;
+    border: 1px solid #090909;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+
+/* Dropdown items styling */
+.form-select option {
+    background-color: white;
+    color: black;
+    padding: 10px;
+}
+
+        .form-control::placeholder {
+            color: rgba(251, 247, 247, 0.944);
+        }
+
+        /* Ensure date input text is white */
+        input[type="date"] {
+            color: white;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1); /* Makes the calendar icon white */
+        }
+
+        .add-alert-btn {
+            font-weight: bold;
+            width: 50%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .alert-list li {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .delete-btn {
+            color: red;
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body onload="loadAlerts(); loadUploadedDocuments(); checkAlerts();">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-black d-flex justify-content-between align-items-center px-3">
+        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+            <div class="collapse w-100" id="navbarNav">
+                <ul class="navbar-nav mt-2 text-start">
+                    <li class="nav-item"><a class="nav-link" href="upload.html">Upload</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="alert.html">Alerts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="search.html">Search</a></li>
+                    <li class="nav-item"><a class="nav-link" href="welcome.html">Back</a></li>
+                </ul>
+            </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container d-flex flex-column align-items-center justify-content-center vh-100">
+        <h2>🔔Set alerts for the documents</h2><br><br>
+        <div class="alerts-container p-4 rounded text-white text-center w-50">
+            <select id="docSelect" class="form-select mt-2">
+                <option value="" disabled selected>No uploaded documents</option>
+            </select>
+            <input type="date" id="reminderDate" class="form-control mt-2">
+            <input type="email" id="email" class="form-control mt-2" placeholder="Enter Email for Notification">
+            <button class="add-alert-btn btn btn-success mt-3" onclick="addAlert()">Add Alert</button>
+        </div>
+
+        <!-- Alerts List -->
+        <div class="alerts-container p-4 rounded mt-3 w-50">
+            <h2 class="text-danger">Your Alerts</h2>
+            <ul id="alertList" class="list-group alert-list"></ul>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function loadUploadedDocuments() {
+            const docSelect = document.getElementById("docSelect");
+            docSelect.innerHTML = `<option value="" disabled selected>No uploaded documents</option>`;
+    
+            const docs = JSON.parse(localStorage.getItem("uploadedFiles")) || [];
+            if (docs.length > 0) {
+                docSelect.innerHTML = `<option value="" disabled selected>Select Uploaded Document</option>`;
+                docs.forEach(doc => {
+                    const option = document.createElement("option");
+                    option.value = doc.docName;
+                    option.innerText = doc.docName;
+                    docSelect.appendChild(option);
+                });
+            }
+        }
+    
+        function addAlert() {
+    const docSelect = document.getElementById("docSelect");
+    const reminderDate = document.getElementById("reminderDate");
+    const email = document.getElementById("email");
+
+    if (!docSelect.value || !reminderDate.value) {
+        alert("Please select a document and set a date.");
+        return;
+    }
+
+    const alerts = JSON.parse(localStorage.getItem("alerts")) || [];
+    alerts.push({ docName: docSelect.value, date: reminderDate.value, email: email.value });
+    localStorage.setItem("alerts", JSON.stringify(alerts));
+
+    loadAlerts();
+
+    // Reset input fields after adding an alert
+    docSelect.selectedIndex = 0;
+    reminderDate.value = "";
+    email.value = "";
+}
+
+    
+        function loadAlerts() {
+            const alertList = document.getElementById("alertList");
+            alertList.innerHTML = "";
+    
+            const alerts = JSON.parse(localStorage.getItem("alerts")) || [];
+            const uploadedDocs = JSON.parse(localStorage.getItem("uploadedFiles")) || [];
+            
+            const filteredAlerts = alerts.filter(alert => uploadedDocs.some(doc => doc.docName === alert.docName));
+            localStorage.setItem("alerts", JSON.stringify(filteredAlerts));
+            
+            filteredAlerts.forEach((alert, index) => {
+                const li = document.createElement("li");
+                li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+                li.innerHTML = `${alert.docName} - ${alert.date} <span class='delete-btn' onclick='deleteAlert(${index})'>&times;</span>`;
+                alertList.appendChild(li);
+            });
+        }
+    
+        function deleteAlert(index) {
+            const alerts = JSON.parse(localStorage.getItem("alerts")) || [];
+            alerts.splice(index, 1);
+            localStorage.setItem("alerts", JSON.stringify(alerts));
+            loadAlerts();
+            // Reset fields after adding an alert
+            docSelect.selectedIndex = 0;
+            reminderDate.value = "";
+            email.value = "";
+        
+        }
+    
+        window.onload = function() {
+            loadUploadedDocuments();
+            loadAlerts();
+        };
+    </script>
+
+
+</body>
+</html>
